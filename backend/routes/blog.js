@@ -17,19 +17,18 @@ router.post("/blogs", async function (req, res, next) {
 });
 
 router.get("/blogs/:id", function (req, res, next) {
-  const promise1 = pool.query("SELECT * FROM blogs WHERE id=?", [
-    req.params.id,
-  ]);
-  const promise2 = pool.query("SELECT * FROM comments WHERE blog_id=?", [
-    req.params.id,
-  ]);
+  const promise1 = pool.query("SELECT * FROM blogs WHERE id=?", [req.params.id]);
+  const promise2 = pool.query("SELECT * FROM comments WHERE blog_id=?", [req.params.id]);
+  const promise3 = pool.query("SELECT * FROM images WHERE blog_id=?", [req.params.id])
 
-  Promise.all([promise1, promise2])
+  Promise.all([promise1, promise2, promise3])
     .then((results) => {
       const blogs = results[0];
       const comments = results[1];
-      res.render("blogs/detail", {
+      const images = results[2];
+      res.json({
         blog: blogs[0][0],
+        images: images[0],
         comments: comments[0],
         error: null,
       });
