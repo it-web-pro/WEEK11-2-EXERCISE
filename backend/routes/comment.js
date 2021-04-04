@@ -1,4 +1,6 @@
+const { json } = require("express");
 const express = require("express");
+const pool = require("../config");
 
 const router = express.Router();
 
@@ -7,8 +9,17 @@ router.get('/:blogId/comments', function(req, res, next){
 });
 
 // Create new comment
-router.post('/:blogId/comments', function(req, res, next){
-    return
+router.post('/:blogId/comments', async function(req, res, next){
+    comment = req.body.comment
+    try{
+        const [rows, fields] = await pool.query(
+            'INSERT INTO `comments` (`blog_id`, `comment`, `like`, `comment_date`) VALUES (?, ?, ?, CURRENT_TIMESTAMP)', 
+            [req.params.blogId, comment, 0]
+        )
+        return res.json({messageId: rows.insertId})
+    } catch (err) {
+        return res.status(500).json(err)
+    }
 });
 
 // Update comment
