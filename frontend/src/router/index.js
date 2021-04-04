@@ -6,13 +6,18 @@ Vue.use(VueRouter)
 const routes = [
   {
     path: '/',
-    name: 'Home',
+    name: 'home',
     component: () => import('../views/Home.vue')
   },
   {
-    path: '/blogs/:id',
-    name: 'BlogDetail',
-    component: () => import('../views/blogs/BlogDetail.vue')
+    path: '/blogs/detail/:id',
+    name: 'detail',
+    component: () => import('../views/blogs/DetailBlog.vue')
+  },
+  {
+    path: '/blogs/create',
+    name: 'create-blog',
+    component: () => import('../views/blogs/CreateBlog.vue')
   }
 ]
 

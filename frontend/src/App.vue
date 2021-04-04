@@ -3,9 +3,9 @@
     <!-- nav bar -->
     <nav class="navbar" role="navigation" aria-label="main navigation">
       <div class="navbar-brand">
-        <a class="navbar-item is-size-4" href="#/">
+        <router-link to="/" class="navbar-item is-size-4">
           YouBlog
-        </a>
+        </router-link>
 
         <a
           role="button"
@@ -25,9 +25,9 @@
         <div class="navbar-end">
           <div class="navbar-item">
             <div class="buttons">
-              <a class="button is-primary">
+              <router-link to="/blogs/create" class="button is-primary">
                 <strong>New Blog</strong>
-              </a>
+              </router-link>
             </div>
           </div>
 

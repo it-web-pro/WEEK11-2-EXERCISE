@@ -4,20 +4,8 @@ const pool = require("../config");
 
 router = express.Router();
 
-// Search blogs
-router.get("/blogs", async function (req, res, next) {
-  // Your code here
-  const search = req.query.search
-  if (search.length > 0){
-    const [rows, fields] = pool.query('SELECT * FROM `blogs` WHERE `title` LIKE ? OR content LIKE ?', [search, search])
-  }else{
-    const [rows, fields] = pool.query('SELECT * FROM `blogs`')
-  }
-  return res.json(rows)
-});
-
 // Like blog that id = blogId
-router.post("/blogs/addlike/:blogId", async function (req, res, next) {
+router.put("/blogs/addlike/:blogId", async function (req, res, next) {
   const conn = await pool.getConnection()
     // Begin transaction
   await conn.beginTransaction();
@@ -38,7 +26,7 @@ router.post("/blogs/addlike/:blogId", async function (req, res, next) {
     res.json({like: like});
   }catch(err){
     await conn.rollback();
-    next(err);
+    return res.status(500).json(err);
   }finally{
     console.log('finally')
     conn.release();
@@ -70,7 +58,7 @@ router.get("/blogs/:id", function (req, res, next) {
       });
     })
     .catch((err) => {
-      return next(err);
+      return res.status(500).json(err)
     });
 });
 
@@ -86,6 +74,7 @@ router.delete("/blogs/:blogId", async function (req, res, next) {
   await conn.beginTransaction();
 
   try{
+    // Check that there is no comments
     const [rows1, fields1] = await conn.query(
       "SELECT COUNT(*) FROM `comments` WHERE `blog_id` = ?",
       [req.params.blogId]
@@ -95,22 +84,26 @@ router.delete("/blogs/:blogId", async function (req, res, next) {
     if (rows1[0]['COUNT(*)'] > 0){
       return res.status(400).json({message: 'Cannot delete blogs with comments'})
     }
-
+    
+    // Delete images
+    await conn.query(
+      "DELETE FROM `images` WHERE `blog_id` = ?",
+      [req.params.blogId])
+    // Delete the selected blog
     const [rows2, fields2] = await conn.query(
         "DELETE FROM `blogs` WHERE `id` = ?",
         [req.params.blogId])
     
     if (rows2.affectedRows === 1){
       await conn.commit()
-      res.json({message: 'success'});
+      res.status(204)
     } else {
       throw "Cannot delete the selected blog"
     }
   }catch(err){
     await conn.rollback();
-    next(err);
+    return res.status(500).json(err)
   }finally{
-    console.log('finally')
     conn.release();
   }
 });

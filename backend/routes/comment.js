@@ -11,14 +11,26 @@ router.get('/:blogId/comments', function(req, res, next){
 // Create new comment
 router.post('/:blogId/comments', async function(req, res, next){
     comment = req.body.comment
+    const conn = await pool.getConnection()
+    // Begin transaction
+    await conn.beginTransaction();
     try{
-        const [rows, fields] = await pool.query(
+        const [rows1, fields1] = await conn.query(
             'INSERT INTO `comments` (`blog_id`, `comment`, `like`, `comment_date`) VALUES (?, ?, ?, CURRENT_TIMESTAMP)', 
             [req.params.blogId, comment, 0]
         )
-        return res.json({messageId: rows.insertId})
+        const [rows2, fields2] = await conn.query(
+            'SELECT * FROM `comments` WHERE `id` = ?', 
+            [rows1.insertId]
+        )
+        await conn.commit()
+        return res.json(rows2[0])
     } catch (err) {
+        await conn.rollback();
         return res.status(500).json(err)
+    }finally{
+        console.log('finally')
+        conn.release();
     }
 });
 

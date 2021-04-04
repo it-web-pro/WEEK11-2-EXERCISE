@@ -3,7 +3,6 @@
     <section class="section" v-if="error">
       <div class="container is-widescreen">
         <div class="notification is-danger">
-          <!-- <%= error.code + ': ' + error.sqlMessage %> -->
           {{ error }}
         </div>
       </div>
@@ -31,8 +30,17 @@
           </div>
           <div class="card-content">
             <div class="content">{{ blog.content }}</div>
-            <div class="container">
+            <div class="container pb-3">
               <p class="subtitle">Comments</p>
+              <div class="columns">
+                <div class="column is-8">
+                  <input type="text" class="input" v-model="commTxt" placeholder="Add new comment"/>
+                </div>
+                <div class="column is-4">
+                  <button @click="addComment" class="button">Add comment</button>
+                </div>
+              </div>
+            </div>
               <div v-for="comment in comments" :key="comment.id" class="box">
                 <article class="media">
                   <div class="media-left">
@@ -48,22 +56,43 @@
                       <p>{{ comment.comment }}</p>
                       <p class="is-size-7">{{ comment.comment_date }}</p>
                     </div>
-                    <nav class="level is-mobile">
+                    <nav class="level">
                       <div class="level-left">
                         <a class="level-item" aria-label="like">
-                          <span class="icon is-small">
+                          <span class="icon is-small pr-3">
                             <i class="fas fa-heart" aria-hidden="true"></i>
                           </span>
+                          Like (0)
                         </a>
+                      </div>
+                      <div class="level-right">
+                        <div class="level-item">
+                          <button class="button is-warning">
+                            <span>Edit</span>
+                            <span class="icon is-small">
+                              <i class="fas fa-edit"></i>
+                            </span>
+                          </button>
+                        </div>
+                        <div class="level-item">
+                          <button class="button is-danger is-outlined">
+                            <span>Delete</span>
+                            <span class="icon is-small">
+                              <i class="fas fa-times"></i>
+                            </span>
+                          </button>
+                        </div>
                       </div>
                     </nav>
                   </div>
                 </article>
               </div>
             </div>
-          </div>
           <footer class="card-footer">
-            <a class="card-footer-item" href="#/">To Home Page</a>
+            <router-link class="card-footer-item" to="/">To Home Page</router-link>
+            <a class="card-footer-item" @click="deleteBlog">
+              <span>Delete this blog</span>
+            </a>
           </footer>
         </div>
       </div>
@@ -80,22 +109,44 @@ export default {
       blog: {},
       comments: [],
       images: [],
-      error: null
+      error: null,
+      commTxt: ''
     }
   },
   mounted () {
     this.getBlogDetail(this.$route.params.id)
   },
   methods: {
-    getBlogDetail(id) {
-      axios.get(`http://localhost:3000/blogs/${id}`)
-        .then(res => {
-          this.blog = res.data.blog
-          this.images = res.data.images
-          this.comments = res.data.comments
+    getBlogDetail(blogId) {
+      axios.get(`http://localhost:3000/blogs/${blogId}`)
+        .then(response => {
+          this.blog = response.data.blog
+          this.images = response.data.images
+          this.comments = response.data.comments
         })
-        .catch(err => {
-          this.err = err
+        .catch(error => {
+          this.error = error.message
+        })
+    },
+    addComment() {
+      axios.post(`http://localhost:3000/${this.blog.id}/comments`, {
+        comment: this.commTxt
+      })
+        .then(response => {
+          this.comments.push(response.data)
+        })
+        .catch(error => {
+          this.error = error.message
+        })
+    },
+    deleteBlog() {
+      axios.delete(`http://localhost:3000/blogs/${this.blog.id}`)
+        .then(response => {
+          // this.$router.push('/')
+          this.$router.push({ name: 'home' })
+        })
+        .catch(error => {
+          this.error = error.message
         })
     }
   }

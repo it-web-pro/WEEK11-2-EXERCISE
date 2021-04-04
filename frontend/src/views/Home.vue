@@ -2,7 +2,17 @@
   <div class="container is-widescreen">
     <section class="hero">
       <div class="hero-body">
-        <p class="title">My Stories</p>
+        <p class="title">
+          My Stories
+        </p>
+        <div class="columns">
+          <div class="column is-half">
+            <input class="input" type="text" v-model="search" placeholder="Search blog(s)">
+          </div>
+          <div class="column is-half">
+            <button @click="getBlogs" class="button">Search</button>
+          </div>
+        </div>
       </div>
     </section>
     <section class="section" id="app">
@@ -20,13 +30,13 @@
                 <div class="content" style="height: 200px;">{{ shortContent(blog.content) }}</div>
               </div>
               <footer class="card-footer">
-                <a class="card-footer-item" :href="`#/blogs/${blog.id}`">Read more...</a>
-                <a class="card-footer-item">
+                <router-link class="card-footer-item" :to="`/blogs/detail/${blog.id}`">Read more...</router-link>
+                <a class="card-footer-item" @click="addLike(blog.id)">
                   <span class="icon-text">
                     <span class="icon">
                       <i class="far fa-heart"></i>
                     </span>
-                    <span>Like</span>
+                    <span>Like ({{blog.like}})</span>
                   </span>
                 </a>
               </footer>
@@ -45,6 +55,7 @@ export default {
   name: "Home",
   data() {
     return {
+      search: '',
       blogs: [],
     };
   },
@@ -54,7 +65,11 @@ export default {
   methods: {
     getBlogs() {
       axios
-        .get("http://localhost:3000/")
+        .get("http://localhost:3000", {
+          params: {
+            search: this.search
+          }
+        })
         .then((response) => {
           this.blogs = response.data;
         })
@@ -75,6 +90,17 @@ export default {
         return content.substring(0, 197) + '...'
       }
       return content
+    },
+    addLike(blogId) {
+      axios
+        .put(`http://localhost:3000/blogs/addlike/${blogId}`)
+        .then((response) => {
+          let selectedBlog = this.blogs.filter(e => e.id === blogId)[0]
+          selectedBlog.like = response.data.like;
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     }
   },
 
