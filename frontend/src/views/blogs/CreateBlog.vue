@@ -55,11 +55,11 @@
       <div class="control mb-3">
         <label class="radio">
           <input v-model="statusBlog" type="radio" name="answer" value="01" />
-          01
+          Private
         </label>
         <label class="radio">
           <input v-model="statusBlog" type="radio" name="answer" value="02" />
-          02
+          Public
         </label>
       </div>
 
@@ -138,8 +138,8 @@ export default {
 
       axios
         .post("http://localhost:3000/blogs", formData)
-        .then((res) => console.log(res))
-        .catch((e) => console.log(e));
+        .then((res) => this.$router.push({name: 'home'}))
+        .catch((e) => console.log(e.response.data));
     },
   },
 };

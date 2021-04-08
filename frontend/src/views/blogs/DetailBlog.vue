@@ -123,7 +123,7 @@ export default {
           this.comments = response.data.comments;
         })
         .catch((error) => {
-          this.error = error.message;
+          this.error = error.response.data.message;
         });
     },
     addComment() {
@@ -132,14 +132,27 @@ export default {
           comment: this.commTxt,
         })
         .then((response) => {
+          this.commTxt = ''
           this.comments.push(response.data);
         })
         .catch((error) => {
-          this.error = error.message;
+          this.error = error.response.data.message;
         });
     },
     saveEditComment() {},
-    deleteBlog() {},
+    deleteBlog() {
+      const result = confirm(`Are you sure you want to delete \'${this.blog.title}\'`);
+      if (result){
+        axios
+        .delete(`http://localhost:3000/blogs/${this.blog.id}`)
+        .then((response) => {
+          this.$router.push('/')
+        })
+        .catch((error) => {
+          alert(error.response.data.message)
+        });
+      }
+    },
   },
 };
 </script>
