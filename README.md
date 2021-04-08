@@ -27,9 +27,10 @@ ___
 
 3. ใน comment จะมีปุ่ม edit อยู่ โดยเมื่อกดแล้วจะทำการเปลี่ยนข้อความของ comment ให้เป็น input และมีข้อความเก่าใน input ด้วย และปุ่ม edit กับ delete จะกลายเป็นปุ่ม save edit comment และปุ่ม cancel 
 <img src="imgEx/ezgif.com-gif-maker.gif"/>
+
 โดยปุ่ม save edit comment เมื่อกดแล้วจะ update ค่าใหม่ลงใน database และเปลี่ยนกลับเป็น comment แบบเดิมที่แก้ไขข้อมูลแล้ว ส่วน cancel คือกลับไปเป็น comment แบบเดิมที่ยังไม่แก้ไข
 ___
-####Extra
+#### Extra
 4. ทำการออกแบบการ Update ข้อมูลของ Blog รวมไปถึงรูปภาพของ Blog ด้วย โดยมีข้อกำหนดดังนี้
     1. หน้า Update ข้อมูลของ Blog จะมี Url คือ `/blogs/update/:id` และจะมีไฟล์หน้า Update มาให้แล้ว ชื่อว่า `views/blogs/UpdateBlog.vue`
     2. ในหน้า Update Blog จะมีฟอร์มมาให้ เมื่อเข้ามาในหน้านี้ ให้ทำการดึงข้อมูลดั้งเดิมของ Blog นั้นๆ ออกมาใส่ใน Form ที่มีให้ โดยใช้ params id ที่อยู่ใน URL กำหนดว่าจะดึงข้อมูล Blog ไหน
