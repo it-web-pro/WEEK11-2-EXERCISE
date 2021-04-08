@@ -25,10 +25,10 @@ ___
 > hint : ดูการใช้งาน Confirm ได้[ที่นี่](https://www.w3schools.com/jsref/met_win_confirm.asp)
 ___
 
-3. ใน comment จะมีปุ่ม edit อยู่ โดยเมื่อกดแล้วจะทำการเปลี่ยนข้อความของ comment ให้เป็น input และมีข้อความเก่าใน input ด้วย และปุ่ม edit กับ delete จะกลายเป็นปุ่ม save edit comment และปุ่ม cancel 
+3. ใน comment จะมีปุ่ม edit อยู่ โดยเมื่อกดแล้วจะทำการเปลี่ยนข้อความของ comment ให้เป็นช่อง input และมีข้อความเก่าในช่อง input ด้วย และปุ่ม edit กับ delete จะกลายเป็นปุ่ม save edit comment และปุ่ม cancel 
 <img src="imgEx/ezgif.com-gif-maker.gif"/>
 
-โดยปุ่ม save edit comment เมื่อกดแล้วจะ update ค่าใหม่ลงใน database และเปลี่ยนกลับเป็น comment แบบเดิมที่แก้ไขข้อมูลแล้ว ส่วน cancel คือกลับไปเป็น comment แบบเดิมที่ยังไม่แก้ไข
+โดยปุ่ม save edit comment เมื่อกดแล้วจะ update ค่าใหม่ลงใน database และเปลี่ยนช่อง input กลับเป็น text comment ที่แก้ไขข้อมูลแล้ว ส่วนถ้ากดปุ่ม cancel คือยกเลิกการแก้ไข เปลี่ยนช่อง input กลับไปเป็น text comment แบบเดิมที่ยังไม่แก้ไข
 ___
 #### Extra
 4. ทำการออกแบบการ Update ข้อมูลของ Blog รวมไปถึงรูปภาพของ Blog ด้วย โดยมีข้อกำหนดดังนี้
