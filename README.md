@@ -14,7 +14,7 @@ $ cd frontend
 $ npm run serve
 ```
 
-###Exercise
+### Exercise
 
 ___
 
