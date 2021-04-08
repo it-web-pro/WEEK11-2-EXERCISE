@@ -18,6 +18,11 @@ const routes = [
     path: '/blogs/create',
     name: 'create-blog',
     component: () => import('../views/blogs/CreateBlog.vue')
+  },
+  {
+    path: '/blogs/update/:id',
+    name: 'update-blog',
+    component: () => import('../views/blogs/UpdateBlog.vue')
   }
 ]
 
