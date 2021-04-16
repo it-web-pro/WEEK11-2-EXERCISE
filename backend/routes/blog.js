@@ -134,8 +134,52 @@ router.get("/blogs/:id", function (req, res, next) {
     });
 });
 
-router.put("/blogs/:id", function (req, res) {
+router.put("/blogs/:id", upload.array("myImage", 5), async function (req, res, next) {
   // Your code here
+  const file = req.files;
+  let pathArray = []
+
+  if (!file) {
+    const error = new Error("Please upload a file");
+    error.httpStatusCode = 400;
+    next(error);
+  }
+
+  const title = req.body.title;
+  const content = req.body.content;
+  const status = req.body.status;
+  const pinned = req.body.pinned;
+
+  const conn = await pool.getConnection()
+  await conn.beginTransaction();
+
+  try {
+    console.log(content)
+    let results = await conn.query(
+      "UPDATE blogs SET title=?, content=?, status=?, pinned=? WHERE id=?",
+      [title, content, status, pinned, req.params.id]
+    )
+
+    if (file.length > 0) {
+      file.forEach((file, index) => {
+        let path = [req.params.id, file.path.substring(6), 0]
+        pathArray.push(path)
+      })
+
+      await conn.query(
+        "INSERT INTO images(blog_id, file_path, main) VALUES ?;",
+        [pathArray])
+    }
+
+    await conn.commit()
+    res.send("success!");
+  } catch (err) {
+    await conn.rollback();
+    next(err);
+  } finally {
+    console.log('finally')
+    conn.release();
+  }
   return;
 });
 

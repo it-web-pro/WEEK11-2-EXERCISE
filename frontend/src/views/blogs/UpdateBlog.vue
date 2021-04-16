@@ -17,26 +17,29 @@
     <section class="px-6">
       <h1 class="is-size-4">Exist Image</h1>
 
-      <div class="columns is-multiline">
-        <div class="column is-one-quarter">
+      <div v-if="currentImage.length > 0" class="columns is-multiline">
+        <div v-for="(image) in currentImage" :key="image.id" class="column is-one-quarter">
           <div class="card">
             <div class="card-image">
               <figure class="image is-4by3">
-                <img :src="'http://localhost:3000'" alt="Placeholder image" />
+                <img :src="'http://localhost:3000'+image.file_path" alt="Placeholder image" />
               </figure>
             </div>
             <footer class="card-footer">
-              <a class="card-footer-item has-text-danger">Delete</a>
-              <span class="icon card-footer-item">
-                <i class="fas fa-star mt-5"></i>
-                <i class="far fa-star mt-5"></i>
+              <a
+                @click="deleteCurrentImage(image.id)"
+                class="card-footer-item has-text-danger"
+              >Delete</a>
+              <span @click="selectMainId = image.id" class="icon card-footer-item">
+                <i v-if="selectMainId === image.id" class="fas fa-star mt-5"></i>
+                <i v-else class="far fa-star mt-5"></i>
               </span>
             </footer>
           </div>
         </div>
       </div>
       <div class="control">
-        <button class="button is-link mb-2">Update Main</button>
+        <button @click="updateMainImage()" class="button is-link mb-2">Update Main</button>
       </div>
 
       <h1 class="is-size-4">New Image</h1>
@@ -128,24 +131,25 @@ export default {
       statusBlog: "01",
     };
   },
-  // created() {
-  //   axios
-  //     .get(`http://localhost:3000/blogs/${this.$route.params.id}`)
-  //     .then((response) => {
-  //       console.log(response.data);
-  //       this.titleBlog = response.data.blog.title;
-  //       this.contentBlog = response.data.blog.content;
-  //       this.pinnedBlog = response.data.blog.pinned ? 1 : 0;
-  //       this.statusBlog = response.data.blog.status;
-  //       this.currentImage = response.data.images;
-  //       this.selectMainId = this.currentImage.filter((x) => x.main === 1)[0].id;
-  //     })
-  //     .catch((e) => {
-  //       console.log(e);
-  //     });
-  // },
+  created() {
+    axios
+      .get(`http://localhost:3000/blogs/${this.$route.params.id}`)
+      .then((response) => {
+        console.log(response.data);
+        this.titleBlog = response.data.blog.title;
+        this.contentBlog = response.data.blog.content;
+        this.pinnedBlog = response.data.blog.pinned ? 1 : 0;
+        this.statusBlog = response.data.blog.status;
+        this.currentImage = response.data.images;
+        this.selectMainId = this.currentImage.filter((x) => x.main === 1)[0].id;
+      })
+      .catch((e) => {
+        console.log(e);
+      });
+  },
   methods: {
     selectImages(event) {
+      //   console.log(URL.createObjectURL(event.target.files[0]));
       this.images = event.target.files;
     },
     showSelectImage(image) {
@@ -155,6 +159,56 @@ export default {
       console.log(this.images);
       this.images = Array.from(this.images);
       this.images.splice(index, 1);
+    },
+
+    updateMainImage() {
+      console.log("ccc");
+      axios
+        .put(
+          `http://localhost:3000/image/setmain/${this.$route.params.id}/${this.selectMainId}`
+        )
+        .then((response) => {
+          console.log(response);
+          this.$router.push({ path: "/" });
+        })
+        .catch((e) => {
+          console.log(e);
+        });
+    },
+    deleteCurrentImage(imageId) {
+      let comfirmDeleteImage = confirm("Are you sure to delete this image");
+      if (comfirmDeleteImage == true) {
+        axios
+          .delete("http://localhost:3000/image/" + imageId)
+          .then((response) => {
+            console.log("delete image ", response);
+            this.$router.push({ path: "/" });
+          })
+          .catch((e) => {
+            console.log(e);
+          });
+      }
+    },
+
+    submitBlog() {
+      console.log(this.statusBlog);
+      let formData = new FormData();
+      //   formData.append("myImage", this.imageBlog);
+      formData.append("title", this.titleBlog);
+      formData.append("content", this.contentBlog);
+      formData.append("pinned", this.pinnedBlog ? 1 : 0);
+      formData.append("status", this.statusBlog);
+      this.images.forEach((image) => {
+        formData.append("myImage", image);
+      });
+
+      axios
+        .put("http://localhost:3000/blogs/" + this.$route.params.id, formData)
+        .then((res) => {
+          console.log(res);
+          this.$router.push({ path: "/" });
+        })
+        .catch((e) => console.log(e));
     },
   },
 };

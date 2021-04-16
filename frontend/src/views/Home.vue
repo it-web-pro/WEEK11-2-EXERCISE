@@ -2,12 +2,10 @@
   <div class="container is-widescreen">
     <section class="hero">
       <div class="hero-body">
-        <p class="title">
-          My Stories
-        </p>
+        <p class="title">My Stories</p>
         <div class="columns">
           <div class="column is-half">
-            <input class="input" type="text" v-model="search" placeholder="Search blog(s)">
+            <input class="input" type="text" v-model="search" placeholder="Search blog(s)" />
           </div>
           <div class="column is-half">
             <button @click="getBlogs" class="button">Search</button>
@@ -22,7 +20,11 @@
             <div class="card">
               <div class="card-image pt-5">
                 <figure class="image">
-                  <img style="height: 120px" :src="imagePath(blog.file_path)" alt="Placeholder image" />
+                  <img
+                    style="height: 120px"
+                    :src="imagePath(blog.file_path)"
+                    alt="Placeholder image"
+                  />
                 </figure>
               </div>
               <div class="card-content">
@@ -37,6 +39,14 @@
                       <i class="far fa-heart"></i>
                     </span>
                     <span>Like ({{blog.like}})</span>
+                  </span>
+                </a>
+                <a
+                  class="card-footer-item"
+                  @click="$router.push({name:'update-blog',params:{id:blog.id}})"
+                >
+                  <span class="icon-text">
+                    <span>Edit</span>
                   </span>
                 </a>
               </footer>
@@ -55,20 +65,20 @@ export default {
   name: "Home",
   data() {
     return {
-      search: '',
+      search: "",
       blogs: [],
     };
   },
-  mounted () {
-    this.getBlogs()
+  mounted() {
+    this.getBlogs();
   },
   methods: {
     getBlogs() {
       axios
         .get("http://localhost:3000", {
           params: {
-            search: this.search
-          }
+            search: this.search,
+          },
         })
         .then((response) => {
           this.blogs = response.data;
@@ -78,31 +88,29 @@ export default {
         });
     },
     imagePath(file_path) {
-      if (file_path){
-        return 'http://localhost:3000/' + file_path
-      } 
-      else {
-        return 'https://bulma.io/images/placeholders/640x360.png'
+      if (file_path) {
+        return "http://localhost:3000/" + file_path;
+      } else {
+        return "https://bulma.io/images/placeholders/640x360.png";
       }
     },
     shortContent(content) {
       if (content.length > 200) {
-        return content.substring(0, 197) + '...'
+        return content.substring(0, 197) + "...";
       }
-      return content
+      return content;
     },
     addLike(blogId) {
       axios
         .put(`http://localhost:3000/blogs/addlike/${blogId}`)
         .then((response) => {
-          let selectedBlog = this.blogs.filter(e => e.id === blogId)[0]
+          let selectedBlog = this.blogs.filter((e) => e.id === blogId)[0];
           selectedBlog.like = response.data.like;
         })
         .catch((err) => {
           console.log(err);
         });
-    }
+    },
   },
-
 };
 </script>
