@@ -39,16 +39,16 @@
                 </div>
               </div>
             </div>
-            <div v-for="(comment) in comments" :key="comment.id" class="box">
+            <div v-for="(comment,index) in comments" :key="comment.id" class="box">
               <article class="media">
                 <div class="media-left">
                   <figure class="image is-64x64">
                     <img src="https://bulma.io/images/placeholders/128x128.png" alt="Image" />
                   </figure>
                 </div>
-                <div class="media-content">
+                <div v-if="index===editToggle" class="media-content">
                   <div class="content">
-                    <p>{{ comment.comment }}</p>
+                    <input v-model="editCommentMessage" class="input" type="text" />
                     <p class="is-size-7">{{ comment.comment_date }}</p>
                   </div>
                   <nav class="level">
@@ -62,7 +62,47 @@
                     </div>
                     <div class="level-right">
                       <div class="level-item">
-                        <button class="button is-warning">
+                        <button
+                          @click="saveEditComment(comment.id,index)"
+                          class="button is-primary"
+                        >
+                          <span>Save Comment</span>
+                          <span class="icon is-small">
+                            <i class="fas fa-edit"></i>
+                          </span>
+                        </button>
+                      </div>
+                      <div class="level-item">
+                        <button @click="editToggle = -1" class="button is-info is-outlined">
+                          <span>Cancel</span>
+                          <span class="icon is-small">
+                            <i class="fas fa-times"></i>
+                          </span>
+                        </button>
+                      </div>
+                    </div>
+                  </nav>
+                </div>
+                <div v-else class="media-content">
+                  <div class="content">
+                    <p>{{ comment.comment }}</p>
+                    <p class="is-size-7">{{ comment.comment_date }}</p>
+                  </div>
+                  <nav class="level">
+                    <div class="level-left">
+                      <a @click="addLikeComment(comment.id)" class="level-item" aria-label="like">
+                        <span class="icon is-small pr-3">
+                          <i class="fas fa-heart" aria-hidden="true"></i>
+                        </span>
+                        Like ({{comment.like}})
+                      </a>
+                    </div>
+                    <div class="level-right">
+                      <div class="level-item">
+                        <button
+                          @click="editToggle = index;editCommentMessage = comment.comment"
+                          class="button is-warning"
+                        >
                           <span>Edit</span>
                           <span class="icon is-small">
                             <i class="fas fa-edit"></i>
@@ -70,7 +110,10 @@
                         </button>
                       </div>
                       <div class="level-item">
-                        <button class="button is-danger is-outlined">
+                        <button
+                          @click="deleteComment(comment.id, index)"
+                          class="button is-danger is-outlined"
+                        >
                           <span>Delete</span>
                           <span class="icon is-small">
                             <i class="fas fa-times"></i>
@@ -132,25 +175,66 @@ export default {
           comment: this.commTxt,
         })
         .then((response) => {
-          this.commTxt = ''
+          this.commTxt = "";
           this.comments.push(response.data);
         })
         .catch((error) => {
           this.error = error.response.data.message;
         });
     },
-    saveEditComment() {},
-    deleteBlog() {
-      const result = confirm(`Are you sure you want to delete \'${this.blog.title}\'`);
-      if (result){
-        axios
-        .delete(`http://localhost:3000/blogs/${this.blog.id}`)
+    saveEditComment(commentId, index) {
+      axios
+        .put(`http://localhost:3000/comments/${commentId}`, {
+          comment: this.editCommentMessage,
+        })
         .then((response) => {
-          this.$router.push('/')
+          this.comments[index].comment = response.data.comment;
+          this.editToggle = -1;
         })
         .catch((error) => {
-          alert(error.response.data.message)
+          this.error = error.message;
         });
+    },
+    deleteComment(commentId, index) {
+      const result = confirm(`Are you sure you want to delete this comment`);
+      if (result) {
+        axios
+          .delete(`http://localhost:3000/comments/${commentId}`)
+          .then((response) => {
+            console.log(response);
+            this.comments.splice(index, 1);
+          })
+          .catch((error) => {
+            this.error = error.message;
+          });
+      }
+    },
+    addLikeComment(commentId) {
+      axios
+        .put(`http://localhost:3000/comments/addlike/${commentId}`)
+        .then((response) => {
+          let selectedComment = this.comments.filter(
+            (e) => e.id === commentId
+          )[0];
+          console.log(selectedComment);
+          selectedComment.like = response.data.like;
+          console.log(selectedComment);
+        })
+        .catch((error) => (this.error = error.message));
+    },
+    deleteBlog() {
+      const result = confirm(
+        `Are you sure you want to delete \'${this.blog.title}\'`
+      );
+      if (result) {
+        axios
+          .delete(`http://localhost:3000/blogs/${this.blog.id}`)
+          .then((response) => {
+            this.$router.push("/");
+          })
+          .catch((error) => {
+            alert(error.response.data.message);
+          });
       }
     },
   },
