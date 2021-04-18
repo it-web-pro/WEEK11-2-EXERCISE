@@ -18,7 +18,7 @@
               <div v-for="image in images" :key="image.id" class="column">
                 <figure class="image">
                   <img
-                    :src="'http://localhost:3000'+image.file_path"
+                    :src="'http://localhost:3000' + image.file_path"
                     alt="Placeholder image"
                     style="height: 500px; object-fit: cover;"
                   />
@@ -32,10 +32,17 @@
               <p class="subtitle">Comments</p>
               <div class="columns">
                 <div class="column is-8">
-                  <input type="text" class="input" v-model="commTxt" placeholder="Add new comment" />
+                  <input
+                    type="text"
+                    class="input"
+                    v-model="commTxt"
+                    placeholder="Add new comment"
+                  />
                 </div>
                 <div class="column is-4">
-                  <button @click="addComment" class="button">Add comment</button>
+                  <button @click="addComment" class="button">
+                    Add comment
+                  </button>
                 </div>
               </div>
             </div>
@@ -43,7 +50,10 @@
               <article class="media">
                 <div class="media-left">
                   <figure class="image is-64x64">
-                    <img src="https://bulma.io/images/placeholders/128x128.png" alt="Image" />
+                    <img
+                      src="https://bulma.io/images/placeholders/128x128.png"
+                      alt="Image"
+                    />
                   </figure>
                 </div>
                 <div v-if="index===editToggle" class="media-content">
@@ -53,11 +63,15 @@
                   </div>
                   <nav class="level">
                     <div class="level-left">
-                      <a class="level-item" aria-label="like">
+                      <a
+                        class="level-item"
+                        aria-label="like"
+                        @click="addLike(comment.id)"
+                      >
                         <span class="icon is-small pr-3">
                           <i class="fas fa-heart" aria-hidden="true"></i>
                         </span>
-                        Like (0)
+                        Like ({{ comment.like }})
                       </a>
                     </div>
                     <div class="level-right">
@@ -127,7 +141,9 @@
             </div>
           </div>
           <footer class="card-footer">
-            <router-link class="card-footer-item" to="/">To Home Page</router-link>
+            <router-link class="card-footer-item" to="/"
+              >To Home Page</router-link
+            >
             <a class="card-footer-item" @click="deleteBlog">
               <span>Delete this blog</span>
             </a>
@@ -149,8 +165,8 @@ export default {
       images: [],
       error: null,
       commTxt: "",
-      editToggle: -1,
-      editCommentMessage: "",
+      editCommentId: -1,
+      editCommentMessage: ""
     };
   },
   mounted() {
@@ -160,25 +176,38 @@ export default {
     getBlogDetail(blogId) {
       axios
         .get(`http://localhost:3000/blogs/${blogId}`)
-        .then((response) => {
+        .then(response => {
+          console.log(response);
           this.blog = response.data.blog;
           this.images = response.data.images;
           this.comments = response.data.comments;
         })
-        .catch((error) => {
+        .catch(error => {
+          this.error = error.response.data.message;
+        });
+    },
+    addLike(id) {
+      axios
+        .put(`http://localhost:3000/comments/addlike/${id}`)
+        .then(response => {
+          console.log(response);
+          let comment = this.comments.filter(e => e.id === id)[0];
+          comment.like = response.data.like;
+        })
+        .catch(error => {
           this.error = error.response.data.message;
         });
     },
     addComment() {
       axios
         .post(`http://localhost:3000/${this.blog.id}/comments`, {
-          comment: this.commTxt,
+          comment: this.commTxt
         })
         .then((response) => {
           this.commTxt = "";
           this.comments.push(response.data);
         })
-        .catch((error) => {
+        .catch(error => {
           this.error = error.response.data.message;
         });
     },
@@ -237,6 +266,44 @@ export default {
           });
       }
     },
-  },
+    toggleEditComment(comment){
+      this.editCommentId = comment.id;
+      this.editCommentMessage = comment.comment;
+    },
+    saveEditComment() {
+      axios
+      .put(`http://localhost:3000/comments/${this.editCommentId}`, {
+        comment: this.editCommentMessage
+      })
+      .then(response => {
+          this.comments.forEach(e => {
+            if (e.id === response.data.id) {
+              e = response.data
+            }
+          })
+          
+          this.editCommentId = -1
+        })
+        .catch(error => {
+          console.log(error)
+          this.error = error.response.data.message;
+        });
+    },
+    deleteBlog() {
+      const result = confirm(
+        `Are you sure you want to delete \'${this.blog.title}\'`
+      );
+      if (result) {
+        axios
+          .delete(`http://localhost:3000/blogs/${this.blog.id}`)
+          .then(response => {
+            this.$router.push("/");
+          })
+          .catch(error => {
+            alert(error.response.data.message);
+          });
+      }
+    }
+  }
 };
 </script>

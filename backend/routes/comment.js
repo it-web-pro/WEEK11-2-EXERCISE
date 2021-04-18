@@ -85,5 +85,4 @@ router.put('/comments/addlike/:commentId', async function (req, res, next) {
     }
 });
 
-
-exports.router = router
+exports.router = router;

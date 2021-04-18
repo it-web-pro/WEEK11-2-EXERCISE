@@ -52,12 +52,14 @@ router.put("/blogs/addlike/:blogId", async function (req, res, next) {
   }
 });
 
+// Create new blog
 router.post(
   "/blogs",
   upload.array("myImage", 5),
   async function (req, res, next) {
     if (req.method == "POST") {
       const file = req.files;
+      console.log('req.files:', req.files)
       let pathArray = [];
 
       if (!file) {
@@ -84,6 +86,8 @@ router.post(
           let path = [blogId, file.path.substring(6), index == 0 ? 1 : 0];
           pathArray.push(path);
         });
+
+        console.log('pathArray:', pathArray)
 
         await conn.query(
           "INSERT INTO images(blog_id, file_path, main) VALUES ?;",
