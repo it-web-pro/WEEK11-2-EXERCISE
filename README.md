@@ -21,7 +21,7 @@ ___
 1. เมื่อกดปุ่ม Like ที่ comment ให้ไปเรียก API สำหรับเพิ่ม like ให้ Comment และแสดงตัวเลขของ Like ที่เพิ่มขึ้นด้วย
 ___
 
-2. เมื่อกดปุ่ม delete ให้มี popup confirm ถ้ากด OK ก็ให้ยิง API ให้ลบ Comment จาก Database
+2. เมื่อกดปุ่ม delete ให้มี popup confirm ถ้ากด OK ก็ให้ยิง API ให้ลบ Comment จาก Database โดยเมื่อลบสำเร็จอย่าลืมลบ comment นั้นออกจากหน้าเวบ (โดยไม่ต้อง refresh หน้าจอ)
 > hint : ดูการใช้งาน Confirm ได้[ที่นี่](https://www.w3schools.com/jsref/met_win_confirm.asp)
 ___
 
