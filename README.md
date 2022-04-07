@@ -1,9 +1,9 @@
-# WEEK11-EXERCISE
-Week 11 Exercise - Linking Front-end with Back-end
+# WEEK11-2-EXERCISE
+Week 11 Exercises - Linking Front-end with Back-end
 
 ## Start Backend Server
 ```
-$ git clone https://github.com/it-web-pro/WEEK10-EXERCISE.git
+$ git clone https://github.com/it-web-pro/WEEK11-2-EXERCISE.git
 $ cd backend
 $ npm run serve
 ```
